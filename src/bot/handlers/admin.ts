@@ -30,7 +30,7 @@ import {
   getTelegramWebhookInfo,
   deleteTelegramWebhook,
 } from '../../lib/telegram';
-import { deleteVercelProject } from '../../lib/vercel';
+import { deleteVercelProject } from '../../lib/vercelService';
 import { deleteGitHubRepository } from '../../lib/github';
 import { getAdminPanelKeyboard } from '../keyboards';
 import { createSafeButton } from '../../lib/callbackCache';

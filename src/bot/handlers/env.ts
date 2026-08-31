@@ -11,7 +11,7 @@ import {
   deleteVercelEnvVariable,
   maskSecretValue,
   VercelEnvVar,
-} from '../../lib/vercel';
+} from '../../lib/vercelService';
 import { createSafeButton } from '../../lib/callbackCache';
 import { TelegramCallbackQuery, TelegramMessage, InlineKeyboardButton } from '../../types';
 

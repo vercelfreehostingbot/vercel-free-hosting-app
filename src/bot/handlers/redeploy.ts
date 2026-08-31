@@ -4,7 +4,7 @@
 
 import { getUserProjects, getProject, saveProject, logSystemAction } from '../../lib/firebase';
 import { sendMessage, editMessageText, answerCallbackQuery } from '../../lib/telegram';
-import { redeployVercelProject, pollVercelDeployment } from '../../lib/vercel';
+import { redeployVercelProject, pollVercelDeployment } from '../../lib/vercelService';
 import { getProjectActionKeyboard } from '../keyboards';
 import { TelegramMessage, TelegramCallbackQuery } from '../../types';
 

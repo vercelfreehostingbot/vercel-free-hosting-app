@@ -4,7 +4,7 @@
 
 import { getUserProjects, getProject, deleteProjectRecord, logSystemAction } from '../../lib/firebase';
 import { sendMessage, editMessageText, answerCallbackQuery } from '../../lib/telegram';
-import { deleteVercelProject } from '../../lib/vercel';
+import { deleteVercelProject } from '../../lib/vercelService';
 import { deleteGitHubRepository } from '../../lib/github';
 import { getDeleteConfirmKeyboard } from '../keyboards';
 import { TelegramMessage, TelegramCallbackQuery } from '../../types';

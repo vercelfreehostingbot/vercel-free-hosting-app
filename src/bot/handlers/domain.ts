@@ -5,7 +5,7 @@
 import { getUserProjects, getProject, saveProject, getUserState, setUserState, clearUserState, logSystemAction } from '../../lib/firebase';
 import { sendMessage, editMessageText, answerCallbackQuery } from '../../lib/telegram';
 import { validateDomainName } from '../../lib/security';
-import { addDomainToVercel } from '../../lib/vercel';
+import { addDomainToVercel } from '../../lib/vercelService';
 import { getCancelKeyboard, getProjectActionKeyboard } from '../keyboards';
 import { TelegramMessage, TelegramCallbackQuery } from '../../types';
 

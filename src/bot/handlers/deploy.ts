@@ -28,7 +28,7 @@ import {
   getOrCreateVercelProject,
   createVercelDeployment,
   pollVercelDeployment,
-} from '../../lib/vercel';
+} from '../../lib/vercelService';
 import { getProjectActionKeyboard, getMainMenuKeyboard } from '../keyboards';
 import { TelegramMessage, TelegramCallbackQuery, ProjectRecord } from '../../types';
 
