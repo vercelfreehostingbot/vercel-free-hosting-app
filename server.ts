@@ -9,7 +9,7 @@ import { createServer as createViteServer } from 'vite';
 import { processTelegramUpdate } from './src/bot/index';
 import { getPollingStatus } from './src/bot/polling';
 import { verifyWebhookSecret } from './src/lib/security';
-import { getTelegramWebhookInfo, getTelegramMe } from './src/lib/telegram';
+import { getTelegramWebhookInfo, getTelegramMe, setTelegramWebhook } from './src/lib/telegram';
 import { getSystemStats } from './src/lib/firebase';
 import { CONFIG } from './src/lib/config';
 import { startBotWatchdog, getWatchdogStatus, ensureWebhookActive } from './src/lib/watchdog';
@@ -98,6 +98,25 @@ async function startServer() {
   app.post('/api/telegram/webhook', handleTelegramWebhook);
   app.get('/api/telegram-webhook', handleTelegramWebhookGet);
   app.get('/api/telegram/webhook', handleTelegramWebhookGet);
+
+  // 1-Click Webhook Registration API
+  app.post('/api/set-webhook', async (req: Request, res: Response) => {
+    try {
+      const host = req.headers.host || '';
+      const protocol = req.headers['x-forwarded-proto'] || 'https';
+      const appUrl = (CONFIG.APP_URL || `${protocol}://${host}`).replace(/\/$/, '');
+      const webhookUrl = `${appUrl}/api/telegram-webhook`;
+
+      const result = await setTelegramWebhook(webhookUrl);
+      res.json({
+        ok: result.ok,
+        webhook_url: webhookUrl,
+        description: result.description || (result.ok ? 'Webhook successfully activated on Telegram' : 'Failed to register webhook'),
+      });
+    } catch (err: any) {
+      res.status(500).json({ ok: false, error: err.message });
+    }
+  });
 
   // -------------------------------------------------------------
   // 2. SYSTEM STATUS & TELEMETRY API

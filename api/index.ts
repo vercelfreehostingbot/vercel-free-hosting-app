@@ -2,7 +2,7 @@ import type { Request, Response } from 'express';
 import express from 'express';
 import { processTelegramUpdate } from '../src/bot/index';
 import { verifyWebhookSecret } from '../src/lib/security';
-import { getTelegramWebhookInfo, getTelegramMe } from '../src/lib/telegram';
+import { getTelegramWebhookInfo, getTelegramMe, setTelegramWebhook } from '../src/lib/telegram';
 import { getSystemStats } from '../src/lib/firebase';
 import { CONFIG } from '../src/lib/config';
 import { getWatchdogStatus } from '../src/lib/watchdog';
@@ -14,7 +14,7 @@ app.use(express.json({ limit: '60mb' }));
 app.use(express.urlencoded({ extended: true, limit: '60mb' }));
 
 // Health Check
-app.get('/api/health', (req: Request, res: Response) => {
+app.get(['/api/health', '/health', '/api', '/'], (req: Request, res: Response) => {
   res.status(200).json({ status: 'ok', platform: 'vercel', timestamp: Date.now() });
 });
 
@@ -60,19 +60,48 @@ const handleWebhookGet = (req: Request, res: Response) => {
   });
 };
 
-app.post('/api/telegram-webhook', handleWebhook);
-app.post('/api/telegram/webhook', handleWebhook);
-app.get('/api/telegram-webhook', handleWebhookGet);
-app.get('/api/telegram/webhook', handleWebhookGet);
+app.post(['/api/telegram-webhook', '/telegram-webhook', '/api/telegram/webhook', '/telegram/webhook'], handleWebhook);
+app.get(['/api/telegram-webhook', '/telegram-webhook', '/api/telegram/webhook', '/telegram/webhook'], handleWebhookGet);
+
+// 1-Click Webhook Registration API for Vercel
+app.post(['/api/set-webhook', '/set-webhook'], async (req: Request, res: Response) => {
+  try {
+    const host = req.headers.host || '';
+    const protocol = req.headers['x-forwarded-proto'] || 'https';
+    const appUrl = (CONFIG.APP_URL || `${protocol}://${host}`).replace(/\/$/, '');
+    const webhookUrl = `${appUrl}/api/telegram-webhook`;
+
+    const result = await setTelegramWebhook(webhookUrl);
+    res.json({
+      ok: result.ok,
+      webhook_url: webhookUrl,
+      description: result.description || (result.ok ? 'Webhook successfully activated on Telegram' : 'Failed to register webhook'),
+    });
+  } catch (err: any) {
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
 
 // System Status API
-app.get('/api/status', async (req: Request, res: Response) => {
+app.get(['/api/status', '/status'], async (req: Request, res: Response) => {
   try {
-    const stats = await getSystemStats();
-    const [webhookInfo, meInfo] = await Promise.all([
-      CONFIG.BOT_TOKEN ? getTelegramWebhookInfo() : null,
-      CONFIG.BOT_TOKEN ? getTelegramMe() : null,
-    ]);
+    let stats: any = null;
+    try {
+      stats = await getSystemStats();
+    } catch (statsErr) {
+      console.warn('[VERCEL] Could not fetch stats:', statsErr);
+    }
+
+    let webhookInfo: any = null;
+    let meInfo: any = null;
+    try {
+      [webhookInfo, meInfo] = await Promise.all([
+        CONFIG.BOT_TOKEN ? getTelegramWebhookInfo() : null,
+        CONFIG.BOT_TOKEN ? getTelegramMe() : null,
+      ]);
+    } catch (tgErr) {
+      console.warn('[VERCEL] Could not fetch Telegram info:', tgErr);
+    }
 
     const botUsername = meInfo?.result?.username ? `@${meInfo.result.username}` : `@${CONFIG.BOT_USERNAME}`;
     const botDisplayName = meInfo?.result?.first_name || CONFIG.BOT_NAME;
