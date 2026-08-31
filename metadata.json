@@ -1,6 +1,7 @@
 {
-  "name": "Vercel Free Hosting Bot",
-  "description": "Production-ready Telegram bot for deploying and managing web projects on Vercel via GitHub and Firebase.",
-  "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+  "name": "Firebase AI Bot",
+  "description": "Vercel ও GitHub-ready AI চ্যাটবট যা Firebase Firestore ডাটাবেজ এবং পরিবেশ ভেরিয়েবলের মাধ্যমে কনফিগার করা যায়।",
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
 }
